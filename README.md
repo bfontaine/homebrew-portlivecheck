@@ -1,4 +1,4 @@
-# Brew-portlivecheck
+# Homebrew-portlivecheck
 
 This tap provides a `portlivecheck` [Homebrew](https://brew.sh) command to find
 new versions of formulae using [MacPorts’ livechecks][livechecks].
