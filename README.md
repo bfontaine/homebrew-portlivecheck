@@ -1,18 +1,14 @@
 # Brew-portlivecheck
 
-## Ruby
+This tap provides a `portlivecheck` [Homebrew](https://brew.sh) command to find
+new versions of formulae using [MacPorts’ livechecks][livechecks].
 
-```ruby
-require "./lib/ports"
+[livechecks]: https://guide.macports.org/chunked/reference.livecheck.html
 
-p = Ports.new("ports")
-p.fetch! # optional
+## Install
 
-ruby20 = p["ruby20"]
-puts "#{ruby20.name} version #{ruby20.version}"
+    brew tap bfontaine/portlivecheck
 
-puts "Available versions:"
-ruby20.available_versions.sort.each do |version|
-  puts "- #{version}"
-end
-```
+## Usage
+
+    brew portlivecheck

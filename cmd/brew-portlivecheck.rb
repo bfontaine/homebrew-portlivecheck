@@ -13,6 +13,7 @@ module PortLiveCheck
     end
 
     def run
+      @ports.fetch!
       port_names = Set.new ports.all_names
       ohai "Found #{port_names.count} ports"
 
