@@ -78,7 +78,7 @@ class Portfile
   end
 
   def run_livecheck
-    return unless livecheck && livecheck[:url]
+    return unless livecheck && livecheck[:url] && livecheck[:regex]
     begin
       content = Net::HTTP.get(URI.parse(livecheck[:url]))
       content.scan(livecheck[:regex]).map(&:first)
@@ -116,6 +116,10 @@ class Portfile
       regexp.gsub! before, after
     end
 
-    Regexp.new regexp
+    begin
+      Regexp.new regexp
+    rescue RegexpError
+      nil
+    end
   end
 end
