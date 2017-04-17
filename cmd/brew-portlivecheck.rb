@@ -1,7 +1,7 @@
 #! /usr/bin/env ruby
 # -*- coding: UTF-8 -*-
 
-$:.unshift "#{__dir__}/lib"
+$:.unshift "#{__dir__}/../lib"
 
 require "set"
 require "ports"
@@ -9,7 +9,7 @@ require "ports"
 module PortLiveCheck
   class << self
     def ports
-      @ports ||= Ports.new("ports")
+      @ports ||= Ports.new("#{__dir__}/../ports")
     end
 
     def run
