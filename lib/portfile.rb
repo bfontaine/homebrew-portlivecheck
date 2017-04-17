@@ -49,13 +49,15 @@ class Portfile
 
     # Fill-in ${vars}
     @keys.each_pair do |k, v|
-      next if k == "livecheck.regex"
-      v.gsub!(/\$\{([\w\.]+?)\}/) { |m| @keys[$1] || m }
+      v.gsub!(/\$\{([\w\.]+?)\}/) do |m|
+        next m if k == "livecheck.regex" && $1 == "version"
+        @keys[$1] || m
+      end
     end
   end
 
   # strings
-  %w[name version revision description].each do |k|
+  %w[name version homepage revision description].each do |k|
     define_method(k.to_sym) { @keys[k] }
   end
 
@@ -69,7 +71,7 @@ class Portfile
                    when "regex" then
                      {
                        :type => :regex,
-                       :url => @keys["livecheck.url"],
+                       :url => @keys["livecheck.url"] || @keys["homepage"],
                        :regex => livecheck_regex,
                      }
                    end
@@ -77,10 +79,11 @@ class Portfile
 
   def run_livecheck
     return unless livecheck && livecheck[:url]
-    content = Net::HTTP.get(URI.parse(livecheck[:url]))
-    # Return all MatchData objects
-    content.to_enum(:scan, livecheck[:regex]).map do
-      Regexp.last_match["version"]
+    begin
+      content = Net::HTTP.get(URI.parse(livecheck[:url]))
+      content.scan(livecheck[:regex]).map(&:first)
+    rescue
+      []
     end
   end
 
@@ -96,15 +99,19 @@ class Portfile
 
   def livecheck_regex
     subregexps = {
-      "(${version})" => "(?<version>.+?)",
+      "${version}" => ".+?",
       "${extract.suffix}" => "\.(?:7z|lzma|zip|tgz|tar\.(?:gz|xz|bz2))",
     }
 
     regexp = @keys["livecheck.regex"]
     return unless regexp
 
+    regexp.gsub!(/^"|(?<!\\)"$/, "")
+
     regexp.gsub!("\\[", "[")
     regexp.gsub!("\\]", "]")
+    regexp.gsub!(/\\\\/, "\\")
+
     subregexps.each_pair do |before, after|
       regexp.gsub! before, after
     end
